@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js" integrity="sha512-AI5A3zIoeRSEEX9z3Vyir8NqSMC1pY7r5h2cE+9J6FLsoEmSSGLFaqMQw8SWvoONXogkfFrkQiJfLeHLz3+HOg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Media Transfer</title>
+</head>
+<body class="fullWidth">
+    <div class="flex fillWidth">
+        <div id="client-msg-box">
+            <h3>Message Center</h3>
+            <div class=flex>
+                <input type="text" />
+                <button onclick="handleBtn()">Send to Desktop</button>
+            </div>
+        </div>
+
+        <div id="server-msg-box">
+            <h3>Messages Received from Server</h3>
+            <!-- <span class="flex fullWidth"><p class="msg">Hello</p> <time timedate="12:00:00">12:00</time></span> -->
+        </div>
+    </div>
+
+    <div id="ip_sec" class="flex">
+        <input type=text placeholder="Enter Desktop/Server IP Here" />
+        <button onclick="startSocket(event)">Connect</button>
+    </div>
+
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script>
+        var socket;
+
+        function startSocket(ev) {
+            let input = ev.target.parentElement.getElementsByTagName("input")[0];
+            ev.target.childNodes[0].nodeValue = "Connecting...";
+            let socketIP = input.value;
+            // check if user included port
+            // ALLOW USER TO DISABLE NEED FOR PORT LATER FOR FORWARDED DEVICES
+            if (!socketIP.includes(":")) {
+                // remove trailing '/'
+                if (socketIP.charAt(socketIP.length-1) == "/") socketIP = socketIP.substring(0,socketIP.length-1);
+                socketIP = socketIP + ':9000'
+            }
+            input.value = '';
+            let attempts = 0;
+            let maxAttempts = 2;
+            socket = io(socketIP ,{
+                'reconnection': true,
+                'reconnectionAttempts': maxAttempts
+            });
+            
+            socket.on("connected", ()=>{
+                ev.target.classList.add("confirmed");
+                ev.target.disabled=true;
+                ev.target.childNodes[0].nodeValue = "Connected!";
+            });
+
+            socket.on("connect_error", (err)=>{
+                attempts++;
+                if (attempts > maxAttempts) {
+                    console.warn('Connection to socket failed.');
+                    closeSocket();
+                }
+            });
+
+            socket.on("disconnect", ()=>{closeSocket();})
+
+            
+            socket.on("logMessage", (msg)=>{console.log(msg);});
+            socket.on("message", (txt)=>{displayMessage(createMessage(txt));});
+
+            function createMessage(text) {
+                let span = document.createElement("span");
+                let p = document.createElement("p");
+                let timeDiv = document.createElement("time");
+                // paragraph
+                p.appendChild(document.createTextNode(text));
+
+                // time
+                let time = new Date().toLocaleTimeString().split(" ")[0];
+                timeDiv.dateTime = time; // format: (hh:mm:ss)
+                time = `${time.split(":")[0]}:${time.split(":")[1]}`; // format: (hh:mm)
+                timeDiv.appendChild(document.createTextNode(time));
+
+                span.classList.add("flex", "fullWidth");
+                p.classList.add("msg");
+                span.append(p, timeDiv);
+                return span;
+            }
+
+            function displayMessage(msg) {
+                document.getElementById("server-msg-box").appendChild(msg);
+            }
+
+
+            function closeSocket() {
+                socket.disconnect();
+                let btn = ev.target;
+                if (btn.classList.contains("confirmed")) {
+                    btn.classList.remove("confirmed");
+                    btn.disabled = false;
+                }
+                btn.childNodes[0].nodeValue = "Connect";
+            }
+        }
+
+
+
+        async function handleBtn() { 
+            try {
+                let content = await fetch('/api', {method: "GET"});
+                if (content.status == 200) alert(await content.text());
+            }
+            catch(error) {alert(error);}
+        }
+    </script>
+</body>
+</html>

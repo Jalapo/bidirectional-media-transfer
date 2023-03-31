@@ -1,0 +1,14 @@
+- add file upload (and buffering for visible upload progression?)
+- get ip of server, make pin, share to server front end
+- allow client to connect directly to server with ip and pin
+
+- create separate remote node app for first time setup and easily finding devices on the same network
+    - on "setup screen": connect to remote node, check for other devices connected with the same IP (likely = devices on same local network)
+    - display other local devices on each device, setup and verify random 4 digit pin to connect devices
+        - force deny connection for 10m after 5 failed PIN entries
+    - share IP and clientKey between devices to ensure future remote connections (npm nginx)
+        - clientKey should be random ( charset: A-Z,a-z,0-9,!,@,%,^,&,\ ) and long (32+ chars), theoretically unique between every user and device
+            - uniqueness is useful but not necessary, local connections will not have the same keys
+            - keys are only used to verify authentication for previously connected local devices and will only be shared with other devices on the same network
+            - both devices communicating need each others keys, preventing key stealing
+            - keys shared remotely 

@@ -1,0 +1,80 @@
+html {width: 100%;}
+body {
+    width: 100%;
+    margin: 0;
+}
+input {outline: none;}
+input:focus {border: hsl(0, 0%, 15%) 3px solid;}
+.flex {display: flex;}
+
+.fullWidth {width: 100%;}
+
+
+#client-msg-box {
+    margin-left: 1vw;
+}
+#client-msg-box>.flex {
+    gap: 1rem;
+}
+
+#client-msg-box input {
+    border: hsl(0, 0%, 15%) 2px solid;
+    font-size: 1.25rem;
+}
+
+#server-msg-box {
+    border: 2px solid black;
+    margin-left: auto;
+    max-width: 35%;
+}
+
+#server-msg-box time {
+    border: 1px solid hsl(240, 35%, 50%);
+    width: 20%;
+    margin-left: auto;
+    align-self: end;
+    transform: translateY(-50%);
+    text-align: end;
+}
+
+.msg {
+    width: 80%;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 0.75rem;
+    /* border-bottom: 1px solid red; */
+}
+
+#ip_sec {
+    position: absolute;
+    left: 1%;
+    bottom: 2%;
+    gap: 2rem;
+}
+
+#ip_sec>input {
+    padding: 0.4rem 0.8rem;
+    border: hsl(0,0%, 15%) 2px solid;
+    border-radius: 0.75rem;
+}
+#ip_sec>input:focus {
+    border: hsl(0, 0%, 15%) 3px solid;
+}
+
+#ip_sec>button {
+    background-color: red;
+    font-size: 1.2rem;
+    width: 7.29vw;
+    border: transparent;
+    border-radius: 0.75rem;
+    cursor: pointer;
+}
+#ip_sec>button:hover {
+    background-color: hsl(0, 80%, 60%);
+    cursor: default;
+}
+#ip_sec>button.confirmed {
+    background-color: hsl(120, 80%, 50%);
+    color: black;
+    
+}

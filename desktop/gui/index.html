@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Transfer: Server GUI</title>
+    <link rel="stylesheet" href="server.css"
+</head>
+<body>
+    <h1>Media Transfer: Server GUI</h1>
+    <br>
+    <h3>Message client</h3>
+    <span>
+        <input id="msg-input" type="text" placeholder="Type any message" onkeypress="sendMessage(event)"/>
+        <button id="msg-btn" onclick="sendMessage()">Send</button>
+    </span>
+
+
+    <script>
+        window.addEventListener("DOMContentLoaded", refreshInputs);
+
+
+        function sendMessage(ev = null) {
+            let input = document.getElementById("msg-input");
+            let stringIsEmpty = checkIfStringEmpty(input.value);
+
+            // only accept button press and pressing 'Enter'
+            // do not send message if text input is effectively empty
+            if (ev == null || ev.key == "Enter") {
+                if (!stringIsEmpty) {
+                    // find text box and get text inputted inside
+                    fetch("/server/msg", {
+                        method: "POST",
+                        // headers: {"Content-type": "text/plain"},
+                        body: input.value
+                    }).then(res=>{
+                        // clear text box
+                        if (res.status != 200) alert("Message not sent, API issue?");
+                        input.value = '';
+                    });
+                } else if (stringIsEmpty) input.value = '';
+            }
+
+            function checkIfStringEmpty(string = "") {
+                let parseStr = string;
+                // console.log(parseStr.charAt(0) == (""|| " "));
+                while (parseStr.charAt(0) == ("" || " ")) {
+                    parseStr = parseStr.substring(1);
+                }
+                // console.log(parseStr);
+                if (parseStr == ("" || " ") || parseStr.length == 0) return true;
+                else return false;
+            }
+        }
+
+        // clear text from inputs on reload
+        function refreshInputs() {
+            let inputs = document.querySelectorAll("input");
+            inputs.forEach(i=>{i.value ='';})
+        }
+
+    </script>
+</body>
+</html>
